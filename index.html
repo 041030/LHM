@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刘慧敏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 修改视频背景部分 -->
+    <div class="video-background">
+        <video id="myVideo" 
+               loop 
+               muted 
+               playsinline 
+               webkit-playsinline 
+               preload="auto"
+               x5-video-player-type="h5"
+               x5-video-player-fullscreen="true"
+               x5-video-orientation="portraint">
+            <source src="./assets/fireworks.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="container">
+        <!-- 添加2025年显示 -->
+        <div class="year-display">
+            <span class="name">刘慧敏</span>
+            <span class="year-number">2025</span>
+            <div class="year-decoration"></div>
+        </div>
+
+        <div class="stars"></div>
+        <div class="snow"></div>
+        
+        <!-- 倒计时动画 -->
+        <div class="countdown-animation">
+            <div class="number-animation">3</div>
+            <div class="number-animation">2</div>
+            <div class="number-animation">1</div>
+            <div class="particles"></div>
+        </div>
+
+        <!-- 主要内容 -->
+        <div class="content">
+            <!-- 烟花组 -->
+            <div class="fireworks-group">
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+            </div>
+
+            <!-- 新年祝福 -->
+            <div class="message">
+                <div class="wishes heart-shape">
+                    <p class="typing">愿新的一年充满温暖与惊喜</p>
+                    <p class="typing delay-1">愿你所求皆如愿，所行化坦途</p>
+                    <p class="typing delay-2">愿生活明朗，愿你欢喜如旧</p>
+                    <p class="typing delay-3">愿你遇见更好的自己</p>
+                    <p class="typing delay-4">愿所有的美好如约而至</p>
+                    <p class="typing delay-5">愿你永远笑靥如花，眼里有光</p>
+                    <p class="typing delay-6">愿你被这个世界温柔以待</p>
+                    <p class="typing delay-7">愿你平安喜乐，万事胜意</p>
+                    <p class="typing delay-8">愿你所有的期待都能成真</p>
+                </div>
+            </div>
+
+            <!-- 装饰元素 -->
+            <div class="decorations">
+                <div class="star-group"></div>
+                <div class="sparkles"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改音乐播放器部分 -->
+    <div class="music-player">
+        <audio id="bgMusic" loop>
+            <source src="./assets/background-music.mp3" type="audio/mp3">
+        </audio>
+        <button class="music-toggle" onclick="toggleMusic()">
+            <span class="icon">🎵</span>
+        </button>
+    </div>
+
+    <!-- 修改脚本部分 -->
+    <script>
+        const video = document.getElementById('myVideo');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.querySelector('.music-toggle');
+
+        // 视频性能优化
+        function optimizeVideoPlayback() {
+            // 降低视频质量以提高性能
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                video.width = 640;  // 降低分辨率
+                video.height = 360;
+            }
+            
+            // 检测设备性能
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                video.setAttribute('poster', './assets/fireworks-poster.jpg');
+            }
+        }
+
+        // 音乐控制
+        function toggleMusic() {
+            if (bgMusic.paused) {
+                bgMusic.volume = 1;  // 调整音量到最大
+                bgMusic.play()
+                    .then(() => {
+                        musicToggle.querySelector('.icon').textContent = '🎵';
+                        musicToggle.classList.remove('paused');
+                    })
+                    .catch(error => {
+                        console.log("音乐播放失败:", error);
+                        // 尝试在用户交互时播放
+                        document.addEventListener('click', function initAudio() {
+                            bgMusic.play();
+                            document.removeEventListener('click', initAudio);
+                        }, { once: true });
+                    });
+            } else {
+                bgMusic.pause();
+                musicToggle.querySelector('.icon').textContent = '🎵';
+                musicToggle.classList.add('paused');
+            }
+        }
+
+        // 初始化设置
+        window.addEventListener('DOMContentLoaded', () => {
+            video.muted = true;
+            bgMusic.volume = 1;  // 设置初始音量
+            optimizeVideoPlayback();
+
+            // 预加载音频
+            bgMusic.load();
+        });
+
+        // 添加用户交互触发音频播放
+        document.addEventListener('click', function initAudio() {
+            bgMusic.play()
+                .then(() => {
+                    musicToggle.querySelector('.icon').textContent = '🎵';
+                    musicToggle.classList.remove('paused');
+                })
+                .catch(error => console.log("初始音乐播放失败:", error));
+            
+            document.removeEventListener('click', initAudio);
+        }, { once: true });
+
+        // 倒计时结束后播放视频和音乐
+        setTimeout(() => {
+            // 显示并播放视频
+            video.style.display = 'block';
+            video.play()
+                .then(() => console.log("视频开始播放"))
+                .catch(error => {
+                    console.log("视频播放失败:", error);
+                    video.muted = true;
+                    video.play().catch(e => console.log("静音播放也失败:", e));
+                });
+
+            // 尝试播放音乐
+            bgMusic.play()
+                .then(() => {
+                    musicToggle.querySelector('.icon').textContent = '🎵';
+                    musicToggle.classList.remove('paused');
+                    console.log("音乐开始播放");
+                })
+                .catch(error => {
+                    console.log("音乐播放失败:", error);
+                    // 等待用户交互时播放
+                    document.addEventListener('click', function initAudio() {
+                        bgMusic.play();
+                        document.removeEventListener('click', initAudio);
+                    }, { once: true });
+                });
+        }, 3000);
+
+        // 处理页面可见性变化
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                video.pause();
+                if (!bgMusic.paused) {
+                    bgMusic.pause();
+                }
+            } else {
+                video.play().catch(error => console.log("恢复播放失败:", error));
+                if (!musicToggle.classList.contains('paused')) {
+                    bgMusic.play().catch(error => console.log("恢复音乐播放失败:", error));
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
